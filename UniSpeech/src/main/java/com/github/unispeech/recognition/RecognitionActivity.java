@@ -6,17 +6,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.github.unispeech.ApiKeys;
+
 import com.github.unispeech.App;
 import com.github.unispeech.R;
 import com.github.unispeech.languageselect.SupportedSttLanguage;
-import com.google.android.glass.touchpad.Gesture;
-import com.google.android.glass.touchpad.GestureDetector;
+
 import com.google.glass.widget.SliderView;
 import com.nuance.nmdp.speechkit.Recognition;
 import com.nuance.nmdp.speechkit.Recognizer;
@@ -67,13 +67,7 @@ public class RecognitionActivity extends Activity {
         mStatusText = (TextView) findViewById(R.id.lbl_status);
         mSliderView = (SliderView) findViewById(R.id.indeterm_slider);
 
-        if (App.runningOnGoogleGlass()) {
-            mGestureDetector = new GestureDetector(this);
-            mGestureDetector.setAlwaysConsumeEvents(true);
-            mGestureDetector.setBaseListener(mBaseListener);
-            mGestureDetector.setScrollListener(mScrollListener);
-            mGestureDetector.setFingerListener(mFingerListener);
-        }
+
 
         setStatus(R.string.recog_tap_and_hold);
     }
@@ -182,7 +176,7 @@ public class RecognitionActivity extends Activity {
             startIndeterminate();
             GoogleTranslator.getInstance().execute(speechData.getOriginalText(),
                     mYourLanguage.getTranslationLanguage(),
-                    ApiKeys.GOOGLE_TRANSLATE_API_KEY, new TranslatorCallback(this, speechData));
+                    "", new TranslatorCallback(this, speechData));
         } else {
             speechData.setTranslatedText(speechData.getOriginalText());
             updateSpeechData(speechData);
@@ -203,9 +197,7 @@ public class RecognitionActivity extends Activity {
      */
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
-        if (mGestureDetector != null) {
-            return mGestureDetector.onMotionEvent(event);
-        }
+
         return false;
     }
 
@@ -346,40 +338,5 @@ public class RecognitionActivity extends Activity {
         }
     };
 
-    private GestureDetector.BaseListener mBaseListener = new GestureDetector.BaseListener() {
-        @Override
-        public boolean onGesture(Gesture gesture) {
-            Log.v(TAG, "onGesture: " + gesture);
-            switch (gesture) {
-            }
-            return false;
-        }
-    };
 
-    private GestureDetector.ScrollListener mScrollListener = new GestureDetector.ScrollListener() {
-        @Override
-        public boolean onScroll(float v, float v2, float v3) {
-            Log.v(TAG, "onScroll: " + v + "," + v2 + ","+ v3);
-            return true;
-        }
-    };
-
-    /**
-     * Detect changes in fingers to start, pause, stop the recording process
-     */
-    private GestureDetector.FingerListener mFingerListener = new GestureDetector.FingerListener() {
-        @Override
-        public void onFingerCountChanged(int previousCount, int newCount) {
-            Log.v(TAG, "onFingerCountChanged: " + previousCount + "," + newCount);
-            if (newCount == 1 && previousCount == 0) {
-                startRecognizer();
-            } else if (newCount == 0) {
-                if (mRecognizerRecording) {
-                    stopRecognizer();
-                } else {
-                    cancelRecognizer();
-                }
-            }
-        }
-    };
 }
