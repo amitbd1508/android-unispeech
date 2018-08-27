@@ -18,11 +18,12 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
+        byte [] x =null;
         mSpeechKit = SpeechKit.initialize(
                 this.getApplicationContext(),
-                ApiKeys.NUANCE_API_ID,
-                ApiKeys.NUANCE_HOST,
-                443, false, ApiKeys.NUANCE_APPLICATION_KEY);
+                "",
+                "",
+                443, false,x);
 
         mSpeechKit.connect();
     }
